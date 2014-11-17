@@ -1,0 +1,24 @@
+buildscript {
+	repositories { maven { url 'http://dl.bintray.com/cjstehno/public' } }
+	dependencies { classpath 'gradle-templates:gradle-templates:1.4.1' }
+}
+
+apply plugin:'templates'
+
+import templates.*
+
+task('createSpringProject') << {
+	String projectName = TemplatesPlugin.prompt('Project Name:')
+	String packageName = TemplatesPlugin.prompt('Package:')
+	String packagePath = packageName.replace('.', '/')
+
+	ProjectTemplate.fromRoot(projectName) {
+		"src/main/groovy/$packagePath" {
+			'Application.groovy' template: 'templates/spring/groovy-class.tmpl', packageName: packageName
+		}
+		"src/main/resources/$packagePath" {}
+		"src/test/groovy/$packagePath" {}
+		"src/test/resources/$packagePath" {}
+		'build.gradle' template: 'templates/spring/build.gradle.tmpl', packageName: packageName, projectName: projectName
+	}
+}
